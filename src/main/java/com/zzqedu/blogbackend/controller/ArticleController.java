@@ -6,13 +6,15 @@ import com.zzqedu.blogbackend.vo.Result;
 import com.zzqedu.blogbackend.vo.param.PageParams;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.*;
 
 @Api(tags = "文章相关")
 @RestController
@@ -28,5 +30,27 @@ public class ArticleController {
         List<ArticleVo> articles = articleService.listArticlePage(pageParams);
         return Result.success(articles);
     }
+
+    @ApiOperation(value = "最热文章", notes = "观看数量最多的")
+    @PostMapping("/hot")
+    public Result hotArticles() {
+        int limit = 5;
+        return articleService.hotArticles(limit);
+    }
+
+    @ApiOperation(value = "最新文章", notes = "按照时间排序")
+    @PostMapping("/new")
+    public Result newArticles() {
+        int limit = 5;
+        return articleService.newArticles(limit);
+    }
+
+
+    @ApiOperation(value = "文章归档", notes = "查询 年份-月份 数量")
+    @PostMapping("/listArchives")
+    public Result listArchives() {
+        return articleService.listArchives();
+    }
+
 
 }

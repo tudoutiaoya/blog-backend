@@ -1,7 +1,7 @@
 package com.zzqedu.blogbackend.service.impl;
 
 import com.zzqedu.blogbackend.dao.pojo.SysUser;
-import com.zzqedu.blogbackend.mapper.SysUserMapper;
+import com.zzqedu.blogbackend.dao.mapper.SysUserMapper;
 import com.zzqedu.blogbackend.service.SysUserService;
 import org.springframework.stereotype.Service;
 

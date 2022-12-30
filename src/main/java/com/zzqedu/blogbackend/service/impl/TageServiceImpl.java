@@ -1,7 +1,7 @@
 package com.zzqedu.blogbackend.service.impl;
 
 import com.zzqedu.blogbackend.dao.pojo.Tag;
-import com.zzqedu.blogbackend.mapper.TagMapper;
+import com.zzqedu.blogbackend.dao.mapper.TagMapper;
 import com.zzqedu.blogbackend.service.TageService;
 import com.zzqedu.blogbackend.vo.TagVo;
 import org.springframework.beans.BeanUtils;

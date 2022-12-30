@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzqedu.blogbackend.dao.mapper.ArticleMapper">
+
+    <sql id="all">
+        id,comment_counts,create_date,
+        summary,title,view_counts,
+        weight,author_id,body_id,
+        category_id
+    </sql>
+
+    <select id="listArchives" resultType="com.zzqedu.blogbackend.dao.dos.Archives">
+        select from_unixtime(create_date/1000,'%Y') as year,
+               from_unixtime(create_date/1000, '%m') as month,
+               count(*) as count
+        from ms_article
+        group by year,month
+    </select>
+
+</mapper>

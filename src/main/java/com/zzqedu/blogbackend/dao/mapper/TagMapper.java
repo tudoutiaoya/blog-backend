@@ -1,4 +1,4 @@
-package com.zzqedu.blogbackend.mapper;
+package com.zzqedu.blogbackend.dao.mapper;
 
 import com.zzqedu.blogbackend.dao.pojo.Tag;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

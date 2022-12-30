@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@MapperScan("com.zzqedu.blogbackend.mapper")
+@MapperScan("com.zzqedu.blogbackend.dao.mapper")
 public class MybatisPlusConfig {
 
     // 分页插件

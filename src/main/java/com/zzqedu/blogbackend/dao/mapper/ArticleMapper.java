@@ -1,8 +1,12 @@
-package com.zzqedu.blogbackend.mapper;
+package com.zzqedu.blogbackend.dao.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zzqedu.blogbackend.dao.dos.Archives;
 import com.zzqedu.blogbackend.dao.pojo.Article;
 
+import java.util.List;
+
 public interface ArticleMapper extends BaseMapper<Article> {
+    List<Archives> listArchives();
 }

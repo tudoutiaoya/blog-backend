@@ -1,14 +1,16 @@
 package com.zzqedu.blogbackend.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zzqedu.blogbackend.dao.dos.Archives;
 import com.zzqedu.blogbackend.dao.pojo.Article;
 import com.zzqedu.blogbackend.dao.pojo.SysUser;
-import com.zzqedu.blogbackend.mapper.ArticleMapper;
-import com.zzqedu.blogbackend.mapper.SysUserMapper;
+import com.zzqedu.blogbackend.dao.mapper.ArticleMapper;
 import com.zzqedu.blogbackend.service.ArticleService;
 import com.zzqedu.blogbackend.service.SysUserService;
 import com.zzqedu.blogbackend.service.TageService;
 import com.zzqedu.blogbackend.vo.ArticleVo;
+import com.zzqedu.blogbackend.vo.Result;
 import com.zzqedu.blogbackend.vo.TagVo;
 import com.zzqedu.blogbackend.vo.param.PageParams;
 import org.joda.time.DateTime;
@@ -40,13 +42,39 @@ public class ArticleServiceImpl implements ArticleService {
     public List<ArticleVo> listArticlePage(PageParams pageParams) {
         Page<Article> page = new Page<>(pageParams.getPage(),pageParams.getPageSize());
         page = articleMapper.selectPage(page,null);
-        return copyList(page.getRecords());
+        return copyList(page.getRecords(),true, true);
     }
 
-    private List<ArticleVo> copyList(List<Article> records) {
+    @Override
+    public Result hotArticles(int limit) {
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(Article::getViewCounts);
+        queryWrapper.select(Article::getId,Article::getTitle);
+        queryWrapper.last("limit " + limit);
+        List<Article> articles = articleMapper.selectList(queryWrapper);
+        return Result.success(copyList(articles,false,false));
+    }
+
+    @Override
+    public Result newArticles(int limit) {
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(Article::getCreateDate);
+        queryWrapper.select(Article::getId, Article::getTitle);
+        queryWrapper.last("limit " + limit);
+        List<Article> articles = articleMapper.selectList(queryWrapper);
+        return Result.success(copyList(articles,false,false));
+    }
+
+    @Override
+    public Result listArchives() {
+        List<Archives> articles = articleMapper.listArchives();
+        return Result.success(articles);
+    }
+
+    private List<ArticleVo> copyList(List<Article> records, boolean isAuthor, boolean isTags) {
         List<ArticleVo> articleVoList =  new ArrayList<>();
         for (Article record : records) {
-            ArticleVo articleVo = copy(record,true, true);
+            ArticleVo articleVo = copy(record,isAuthor, isTags);
             articleVoList.add(articleVo);
         }
         return articleVoList;
