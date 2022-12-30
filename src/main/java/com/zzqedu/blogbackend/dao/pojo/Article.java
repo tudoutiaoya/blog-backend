@@ -1,4 +1,4 @@
-package com.zzqedu.blogbackend.model;
+package com.zzqedu.blogbackend.dao.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -18,6 +18,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Article implements Serializable {
+
+    private static final int Article_TOP = 1;
+
+    private static final int Article_Common = 0;
+
     private Long id;
 
     private Integer commentCounts;
@@ -30,7 +35,7 @@ public class Article implements Serializable {
 
     private Integer viewCounts;
 
-    private Integer weight;
+    private Integer weight = Article_Common;
 
     private Long authorId;
 

@@ -1,7 +1,7 @@
 package com.zzqedu.blogbackend;
 
 import com.zzqedu.blogbackend.mapper.ArticleMapper;
-import com.zzqedu.blogbackend.model.Article;
+import com.zzqedu.blogbackend.dao.pojo.Article;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
