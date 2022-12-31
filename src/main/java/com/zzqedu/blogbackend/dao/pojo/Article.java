@@ -19,9 +19,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Article implements Serializable {
 
-    private static final int Article_TOP = 1;
+    public static final int Article_TOP = 1;
 
-    private static final int Article_Common = 0;
+    public static final int Article_Common = 0;
 
     private Long id;
 
@@ -41,6 +41,6 @@ public class Article implements Serializable {
 
     private Long bodyId;
 
-    private Integer categoryId;
+    private Long categoryId;
 
 }

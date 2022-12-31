@@ -23,7 +23,7 @@ public class CommentsController {
         return commentService.getArticleComments(id);
     }
 
-    @ApiOperation(value = "评论", notes = "评论 用户id从threadlocal获取")
+    @ApiOperation(value = "评论-加入到登录拦截器", notes = "评论 用户id从threadlocal获取")
     @PostMapping("create/change")
     public Result createComment(@RequestBody CommentParam commentParam) {
         return commentService.createComment(commentParam);

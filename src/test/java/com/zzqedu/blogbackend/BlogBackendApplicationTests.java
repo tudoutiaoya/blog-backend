@@ -40,7 +40,7 @@ class BlogBackendApplicationTests {
         article.setWeight(0);
         article.setAuthorId(0L);
         article.setBodyId(0L);
-        article.setCategoryId(0);
+        article.setCategoryId(0L);
         articleMapper.insert(article);
     }
 

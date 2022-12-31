@@ -27,7 +27,8 @@ public class WebConfig implements WebMvcConfigurer {
         // 拦截器 拦截接口
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/testInterceptor")
-                .addPathPatterns("/comments/create/change");
+                .addPathPatterns("/comments/create/change")
+                .addPathPatterns("/articles/publish");
     }
 
 }

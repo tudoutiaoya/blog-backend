@@ -3,6 +3,7 @@ package com.zzqedu.blogbackend.service.impl;
 import com.zzqedu.blogbackend.dao.pojo.Tag;
 import com.zzqedu.blogbackend.dao.mapper.TagMapper;
 import com.zzqedu.blogbackend.service.TageService;
+import com.zzqedu.blogbackend.vo.Result;
 import com.zzqedu.blogbackend.vo.TagVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,12 @@ public class TageServiceImpl implements TageService {
         }
         List<Tag> tagList = tagMapper.findTagsByIds(hotTags);
         return copyList(tagList);
+    }
+
+    @Override
+    public Result findAll() {
+        List<Tag> tagList = tagMapper.selectList(null);
+        return Result.success(copyList(tagList));
     }
 
     private List<TagVo> copyList(List<Tag> tags) {

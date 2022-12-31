@@ -4,21 +4,25 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zzqedu.blogbackend.dao.dos.Archives;
 import com.zzqedu.blogbackend.dao.mapper.ArticleBodyMapper;
-import com.zzqedu.blogbackend.dao.pojo.Article;
-import com.zzqedu.blogbackend.dao.pojo.ArticleBody;
-import com.zzqedu.blogbackend.dao.pojo.Category;
-import com.zzqedu.blogbackend.dao.pojo.SysUser;
+import com.zzqedu.blogbackend.dao.mapper.ArticleTagMapper;
+import com.zzqedu.blogbackend.dao.pojo.*;
 import com.zzqedu.blogbackend.dao.mapper.ArticleMapper;
 import com.zzqedu.blogbackend.service.*;
+import com.zzqedu.blogbackend.util.UserThreadLocal;
 import com.zzqedu.blogbackend.vo.*;
+import com.zzqedu.blogbackend.vo.param.ArticleBodyParam;
+import com.zzqedu.blogbackend.vo.param.ArticleParam;
 import com.zzqedu.blogbackend.vo.param.PageParams;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -40,6 +44,10 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Resource
     ThreadService threadService;
+
+    @Resource
+    ArticleTagMapper articleTagMapper;
+
 
     /**
      * 查询文章列表  查文章、作者信息、tags信息
@@ -92,6 +100,55 @@ public class ArticleServiceImpl implements ArticleService {
         return Result.success(articleVo);
     }
 
+    /**
+     * 发表文章
+     * @return 文章id
+     */
+    @Transactional // 加上事务
+    @Override
+    public Result publishArticle(ArticleParam articleParam) {
+        SysUser sysUser = UserThreadLocal.get();
+        // 插入文章
+        Article article = new Article();
+        article.setCommentCounts(0);
+        article.setCreateDate(System.currentTimeMillis());
+        article.setSummary(articleParam.getSummary());
+        article.setTitle(articleParam.getTitle());
+        article.setViewCounts(0);
+        article.setWeight(Article.Article_Common);
+        article.setAuthorId(sysUser.getId());
+        article.setCategoryId(Long.parseLong(articleParam.getCategory().getId()));
+        articleMapper.insert(article);
+
+        // 还有 文章内容表 文章-标签表
+        ArticleBodyParam body = articleParam.getBody();
+        // 文章内容
+        ArticleBody articleBody = new ArticleBody();
+        articleBody.setContent(body.getContent());
+        articleBody.setContentHtml(body.getContentHtml());
+        articleBody.setArticleId(article.getId());
+        articleBodyMapper.insert(articleBody);
+
+        // 文章-标签表
+        List<TagVo> tags = articleParam.getTags();
+        if(tags != null) {
+            for (TagVo tagVo : tags) {
+                ArticleTag articleTag = new ArticleTag();
+                articleTag.setArticleId(article.getId());
+                articleTag.setTagId(Long.parseLong(tagVo.getId()));
+                articleTagMapper.insert(articleTag);
+            }
+        }
+
+        // 更新操作 设置文章内容id 分类id
+        article.setBodyId(articleBody.getId());
+        articleMapper.updateById(article);
+
+        Map<String,String> map = new HashMap<>();
+        map.put("id",article.getId().toString());
+        return Result.success(map);
+    }
+
     private List<ArticleVo> copyList(List<Article> records, boolean isAuthor, boolean isTags) {
         List<ArticleVo> articleVoList =  new ArrayList<>();
         for (Article record : records) {
@@ -108,7 +165,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleVo.setCreateDate(new DateTime(article.getCreateDate()).toString("yyyy-MM-dd HH:mm"));
         // 作者信息 标签信息不一定所有接口都需要
         if(isAuthor) {
-            SysUser sysUser = sysUserService.findSysUserById(article.getId());
+            SysUser sysUser = sysUserService.findSysUserById(article.getAuthorId());
             UserVo userVo = new UserVo();
             userVo.setNickname(sysUser.getNickname());
             userVo.setAvatar(sysUser.getAvatar());
@@ -129,7 +186,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleVo.setCreateDate(new DateTime(article.getCreateDate()).toString("yyyy-MM-dd HH:mm"));
         // 作者信息 标签信息不一定所有接口都需要
         if(isAuthor) {
-            SysUser sysUser = sysUserService.findSysUserById(article.getId());
+            SysUser sysUser = sysUserService.findSysUserById(article.getAuthorId());
             UserVo userVo = new UserVo();
             userVo.setNickname(sysUser.getNickname());
             userVo.setAvatar(sysUser.getAvatar());

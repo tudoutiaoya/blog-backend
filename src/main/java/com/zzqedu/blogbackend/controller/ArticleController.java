@@ -3,6 +3,7 @@ package com.zzqedu.blogbackend.controller;
 import com.zzqedu.blogbackend.service.ArticleService;
 import com.zzqedu.blogbackend.vo.ArticleVo;
 import com.zzqedu.blogbackend.vo.Result;
+import com.zzqedu.blogbackend.vo.param.ArticleParam;
 import com.zzqedu.blogbackend.vo.param.PageParams;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,6 +54,12 @@ public class ArticleController {
     @PostMapping("/view/{id}")
     public Result getArticleById(@PathVariable String id) {
         return articleService.getArticleById(id);
+    }
+
+    @ApiOperation(value = "发表文章", notes = "插入文章 插入内容表 插入文章-标签关系表")
+    @PostMapping("/publish")
+    public Result publish(@RequestBody ArticleParam articleParam) {
+        return articleService.publishArticle(articleParam);
     }
 
 
