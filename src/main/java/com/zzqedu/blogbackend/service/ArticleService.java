@@ -16,4 +16,6 @@ public interface ArticleService {
     Result listArchives();
 
 
+    Result getArticleById(String id);
+
 }

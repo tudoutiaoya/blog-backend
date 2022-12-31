@@ -3,6 +3,7 @@ package com.zzqedu.blogbackend.handler;
 import com.alibaba.fastjson2.JSON;
 import com.zzqedu.blogbackend.dao.pojo.SysUser;
 import com.zzqedu.blogbackend.service.LoginService;
+import com.zzqedu.blogbackend.util.UserThreadLocal;
 import com.zzqedu.blogbackend.vo.ErrorCode;
 import com.zzqedu.blogbackend.vo.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,13 @@ public class LoginInterceptor implements HandlerInterceptor {
             response.getWriter().write(JSON.toJSONString(result));
             return false;
         }
+        UserThreadLocal.put(sysUser);
         return true;
     }
 
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        // 否则会有内存泄露的风险
+        UserThreadLocal.remove();
+    }
 }

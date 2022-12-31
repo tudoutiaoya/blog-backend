@@ -8,10 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -51,6 +48,13 @@ public class ArticleController {
     public Result listArchives() {
         return articleService.listArchives();
     }
+
+    @ApiOperation(value = "查看文章详情", notes = "v1: 查找文章body category tags author ，使用线程池更新文章阅读数量，不会影响主线程执行")
+    @PostMapping("/view/{id}")
+    public Result getArticleById(@PathVariable String id) {
+        return articleService.getArticleById(id);
+    }
+
 
 
 }

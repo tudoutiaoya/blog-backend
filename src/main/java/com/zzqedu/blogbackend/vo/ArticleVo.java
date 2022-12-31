@@ -1,5 +1,6 @@
 package com.zzqedu.blogbackend.vo;
 
+import com.zzqedu.blogbackend.dao.pojo.ArticleBody;
 import com.zzqedu.blogbackend.dao.pojo.SysUser;
 import lombok.Data;
 
@@ -22,12 +23,12 @@ public class ArticleVo {
 
     private Integer weight;
 
-    private String author;
+    private UserVo author;
 
-    private Long bodyId;
+    private ArticleBodyVo body;
 
     private List<TagVo> tags;
 
-    // private List<CategoryVo> categorys;
+    private CategoryVo category;
 
 }

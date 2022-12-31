@@ -8,8 +8,10 @@ import com.zzqedu.blogbackend.service.SysUserService;
 import com.zzqedu.blogbackend.vo.ErrorCode;
 import com.zzqedu.blogbackend.vo.LoginUserVo;
 import com.zzqedu.blogbackend.vo.Result;
+import com.zzqedu.blogbackend.vo.UserVo;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.events.Event;
 
 import javax.annotation.Resource;
 
@@ -71,5 +73,19 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public void save(SysUser sysUser) {
         sysUserMapper.insert(sysUser);
+    }
+
+    @Override
+    public UserVo getUserVoById(Long authorId) {
+        SysUser sysUser = sysUserMapper.selectById(authorId);
+        if(sysUser == null) {
+            sysUser = new SysUser();
+            sysUser.setNickname("土豆条");
+        }
+        UserVo userVo = new UserVo();
+        userVo.setNickname(sysUser.getNickname());
+        userVo.setAvatar(sysUser.getAvatar());
+        userVo.setId(sysUser.getId().toString());
+        return userVo;
     }
 }
