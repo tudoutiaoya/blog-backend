@@ -1,5 +1,6 @@
 package com.zzqedu.blogbackend.controller;
 
+import com.zzqedu.blogbackend.common.aop.LogAnnotation;
 import com.zzqedu.blogbackend.service.ArticleService;
 import com.zzqedu.blogbackend.vo.ArticleVo;
 import com.zzqedu.blogbackend.vo.Result;
@@ -22,6 +23,7 @@ public class ArticleController {
     @Resource
     ArticleService articleService;
 
+    @LogAnnotation(module="文章", operation="获取文章列表")
     @ApiOperation(value = "查询文章列表", notes = "查询文章列表  查文章、作者信息、tags信息")
     @PostMapping()
     public Result getArticlesList(@RequestBody PageParams pageParams) {

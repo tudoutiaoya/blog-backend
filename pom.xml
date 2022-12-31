@@ -122,6 +122,14 @@
             <version>3.12.0</version>
         </dependency>
 
+        <!--aop切面编程-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+
+
 
 
     </dependencies>
