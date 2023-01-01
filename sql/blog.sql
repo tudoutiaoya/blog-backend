@@ -10,7 +10,7 @@ create table ms_article
     weight         int          not null comment '是否置顶',
     author_id      bigint       null comment '作者id',
     body_id        bigint       null comment '内容id',
-    category_id    int          null comment '类别id'
+    category_id    bigint       null comment '类别id'
 )
     charset = utf8mb3;
 
@@ -62,7 +62,7 @@ create table ms_comment
     author_id   bigint                                  not null,
     parent_id   bigint                                  not null,
     to_uid      bigint                                  not null,
-    level       varchar(1)                              not null
+    level       int                                     not null
 )
     charset = utf8mb3;
 
