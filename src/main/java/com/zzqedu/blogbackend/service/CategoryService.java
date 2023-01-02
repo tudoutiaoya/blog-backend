@@ -9,4 +9,8 @@ public interface CategoryService {
     Result findAll();
 
 
+    Result categoryDetails();
+
+
+    Result categoryDetailById(String id);
 }

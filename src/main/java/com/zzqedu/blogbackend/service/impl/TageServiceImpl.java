@@ -1,5 +1,6 @@
 package com.zzqedu.blogbackend.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zzqedu.blogbackend.dao.pojo.Tag;
 import com.zzqedu.blogbackend.dao.mapper.TagMapper;
 import com.zzqedu.blogbackend.service.TageService;
@@ -38,8 +39,22 @@ public class TageServiceImpl implements TageService {
 
     @Override
     public Result findAll() {
+        LambdaQueryWrapper<Tag> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(Tag::getId, Tag::getTagName);
+        List<Tag> tagList = tagMapper.selectList(queryWrapper);
+        return Result.success(copyList(tagList));
+    }
+
+    @Override
+    public Result tagsDetail() {
         List<Tag> tagList = tagMapper.selectList(null);
         return Result.success(copyList(tagList));
+    }
+
+    @Override
+    public Result tagsDetailById(String id) {
+        Tag tag = tagMapper.selectById(id);
+        return Result.success(copy(tag));
     }
 
     private List<TagVo> copyList(List<Tag> tags) {

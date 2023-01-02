@@ -19,4 +19,21 @@
         group by year,month
     </select>
 
+    <select id="listArticleWithDate" resultType="com.zzqedu.blogbackend.dao.pojo.Article">
+        select <include refid="all"></include>
+        from ms_article
+        <where>
+            <if test="categoryId != null">
+                category_id = #{categoryId}
+            </if>
+            <if test="tagId != null">
+                and id in (select article_id from ms_article_tag where tag_id = #{tagId})
+            </if>
+            <if test="year != null and year.length>0 and month != null and month.length>0">
+                and from_unixtime(create_date/1000,'%Y') = #{year} and from_unixtime(create_date/1000, '%m') = #{month}
+            </if>
+        </where>
+        order by weight,create_date desc
+    </select>
+
 </mapper>

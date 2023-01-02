@@ -1,6 +1,7 @@
 package com.zzqedu.blogbackend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zzqedu.blogbackend.dao.dos.Archives;
 import com.zzqedu.blogbackend.dao.mapper.ArticleBodyMapper;
@@ -13,6 +14,7 @@ import com.zzqedu.blogbackend.vo.*;
 import com.zzqedu.blogbackend.vo.param.ArticleBodyParam;
 import com.zzqedu.blogbackend.vo.param.ArticleParam;
 import com.zzqedu.blogbackend.vo.param.PageParams;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
     @Resource
@@ -48,18 +51,57 @@ public class ArticleServiceImpl implements ArticleService {
     @Resource
     ArticleTagMapper articleTagMapper;
 
-
     /**
-     * 查询文章列表  查文章、作者信息、tags信息
+     * 查询文章列表  查文章、作者信息、tags信息  因为Mybatis-plus 不支持from_unixtime 函数，所以重写这个sql
      * @param pageParams
      * @return
      */
     @Override
     public List<ArticleVo> listArticlePage(PageParams pageParams) {
         Page<Article> page = new Page<>(pageParams.getPage(),pageParams.getPageSize());
-        page = articleMapper.selectPage(page,null);
+        // 加入 查询条件 按照分类id  标签 id
+        // 加入 文章 属于 特定分类
+        page = articleMapper.listArticleWithDate(page,
+                pageParams.getCategoryId(),
+                pageParams.getTagId(),
+                pageParams.getYear(),
+                pageParams.getMonth());
         return copyList(page.getRecords(),true, true);
     }
+
+
+    /**
+     * 查询文章列表  查文章、作者信息、tags信息
+     */
+    // @Override
+    // public List<ArticleVo> listArticlePage(PageParams pageParams) {
+    //     log.info("查询条件 分类id 是否为空 {}", (pageParams.getCategoryId() == null));
+    //     log.info("查询条件 标签id 是否为空 {}", (pageParams.getTagId() == null));
+    //     Page<Article> page = new Page<>(pageParams.getPage(),pageParams.getPageSize());
+    //     // 加入 查询条件 按照分类id  标签 id
+    //     // 加入 文章 属于 特定分类
+    //     LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
+    //     if(pageParams.getCategoryId() != null) {
+    //         queryWrapper.eq(Article::getCategoryId, pageParams.getCategoryId());
+    //     }
+    //     // 加入 文章 属于 特定标签
+    //     if(pageParams.getTagId() != null) {
+    //         LambdaQueryWrapper<ArticleTag> articleTagQueryWrapper = new LambdaQueryWrapper<>();
+    //         articleTagQueryWrapper.eq(ArticleTag::getTagId, pageParams.getTagId());
+    //         List<ArticleTag> articleTags = articleTagMapper.selectList(articleTagQueryWrapper);
+    //         List<Long> articlesWithSpecialTag = new ArrayList<>();
+    //         for (ArticleTag articleTag : articleTags) {
+    //             articlesWithSpecialTag.add(articleTag.getArticleId());
+    //         }
+    //         if(articlesWithSpecialTag.size() > 0) {
+    //             // and id in (1,2,3)
+    //             queryWrapper.in(Article::getId, articlesWithSpecialTag);
+    //         }
+    //     }
+    //
+    //     page = articleMapper.selectPage(page,queryWrapper);
+    //     return copyList(page.getRecords(),true, true);
+    // }
 
     @Override
     public Result hotArticles(int limit) {

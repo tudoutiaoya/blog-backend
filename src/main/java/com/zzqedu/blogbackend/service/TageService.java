@@ -12,4 +12,9 @@ public interface TageService {
     List<TagVo> hot(int limit);
 
     Result findAll();
+
+    Result tagsDetail();
+
+
+    Result tagsDetailById(String id);
 }
