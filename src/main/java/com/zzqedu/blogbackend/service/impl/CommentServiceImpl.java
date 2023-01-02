@@ -82,7 +82,8 @@ public class CommentServiceImpl implements CommentService {
         updateWrapper.eq("id", comment.getArticleId());
         updateWrapper.setSql(true, "comment_counts=comment_counts+1");
         articleMapper.update(null,updateWrapper);
-        return Result.success(null);
+
+        return Result.success(copy(comment));
     }
 
     private List<CommentVo> copyList(List<Comment> comments) {
