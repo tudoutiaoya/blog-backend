@@ -1,0 +1,15 @@
+package com.zzqedu.blogbackend.common.cache;
+
+import java.lang.annotation.*;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Cache {
+
+    // 过期时间 毫秒
+    long expire() default 1 * 60 * 1000;
+
+    String name() default "";
+
+}

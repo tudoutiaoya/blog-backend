@@ -19,6 +19,7 @@
         group by year,month
     </select>
 
+    <!--月份需要用 %c  因为 %m 是 01 02 ... 12-->
     <select id="listArticleWithDate" resultType="com.zzqedu.blogbackend.dao.pojo.Article">
         select <include refid="all"></include>
         from ms_article
@@ -30,7 +31,7 @@
                 and id in (select article_id from ms_article_tag where tag_id = #{tagId})
             </if>
             <if test="year != null and year.length>0 and month != null and month.length>0">
-                and from_unixtime(create_date/1000,'%Y') = #{year} and from_unixtime(create_date/1000, '%m') = #{month}
+                and from_unixtime(create_date/1000,'%Y') = #{year} and from_unixtime(create_date/1000, '%c') = #{month}
             </if>
         </where>
         order by weight,create_date desc
