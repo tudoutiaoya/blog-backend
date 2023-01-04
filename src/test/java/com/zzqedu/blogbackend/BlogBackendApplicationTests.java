@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import javax.annotation.Resource;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -54,6 +55,11 @@ class BlogBackendApplicationTests {
                 return 0;
             }
         });
+    }
+
+    @Test
+    void test() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
     }
 
 
