@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
+//对加了@Controller注解的方法进行拦截处理 AOP的实现
 @ControllerAdvice
 public class AllExceptionHandler {
 

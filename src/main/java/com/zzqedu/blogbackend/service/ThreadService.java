@@ -15,14 +15,14 @@ public class ThreadService {
         articleUpdate.setViewCounts(article.getViewCounts() + 1);
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         // 这里很有艺术，为了在多线程的环境下 线程安全
-        queryWrapper.eq(Article::getId, article.getId())
-                .eq(Article::getViewCounts, article.getViewCounts());
+        queryWrapper.eq(Article::getId, article.getId());
+        queryWrapper.eq(Article::getViewCounts, article.getViewCounts());
         articleMapper.update(articleUpdate,queryWrapper);
         // 睡眠5s钟，证明不会影响主线程使用
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        //     Thread.sleep(5000);
+        // } catch (InterruptedException e) {
+        //     throw new RuntimeException(e);
+        // }
     }
 }

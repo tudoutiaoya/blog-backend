@@ -56,7 +56,7 @@ public class ArticleController {
 
     @ApiOperation(value = "查看文章详情", notes = "v1: 查找文章body category tags author ，使用线程池更新文章阅读数量，不会影响主线程执行")
     @PostMapping("/view/{id}")
-    @Cache(expire = 5 * 60 * 1000,name = "view_article")
+    // @Cache(expire = 5 * 60 * 1000,name = "view_article")
     public Result getArticleById(@PathVariable String id) {
         return articleService.getArticleById(id);
     }
