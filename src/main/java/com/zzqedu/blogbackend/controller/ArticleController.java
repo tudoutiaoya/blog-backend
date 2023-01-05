@@ -61,11 +61,18 @@ public class ArticleController {
         return articleService.getArticleById(id);
     }
 
-    @ApiOperation(value = "发表文章", notes = "插入文章 插入内容表 插入文章-标签关系表")
+    @ApiOperation(value = "发表文章-修改文章", notes = "插入文章 插入内容表 插入文章-标签关系表 修改文章发送消息到mq中")
     @PostMapping("/publish")
     public Result publish(@RequestBody ArticleParam articleParam) {
         return articleService.publishArticle(articleParam);
     }
+
+    @ApiOperation(value = "修改文章查询文章id")
+    @PostMapping("{id}")
+    public Result articleById(@PathVariable("id") Long articleId){
+        return articleService.findArticleById(articleId);
+    }
+
 
 
 

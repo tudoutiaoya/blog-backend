@@ -22,4 +22,6 @@ public interface ArticleService {
     Result publishArticle(ArticleParam articleParam);
 
 
+    Result findArticleById(Long articleId);
+
 }

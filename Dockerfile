@@ -8,6 +8,6 @@ VOLUME /tmp
 ADD *.jar /app.jar
 # 运行jar包
 RUN bash -c 'touch /app.jar'
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","/app.jar","--spring.profiles.active=prod"]
 #暴露6001端口作为微服务
 EXPOSE 8080

@@ -1,7 +1,9 @@
 package com.zzqedu.blogbackend.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zzqedu.blogbackend.dao.dos.Archives;
 import com.zzqedu.blogbackend.dao.mapper.ArticleBodyMapper;
@@ -142,54 +144,155 @@ public class ArticleServiceImpl implements ArticleService {
         return Result.success(articleVo);
     }
 
+    @Override
+    public Result findArticleById(Long articleId) {
+        Article article = articleMapper.selectById(articleId);
+        ArticleVo articleVo = copy(article, true, true, true, true);
+        return Result.success(articleVo);
+    }
+
+
     /**
      * 发表文章
      * @return 文章id
      */
+    // @Transactional // 加上事务
+    // @Override
+    // public Result publishArticle(ArticleParam articleParam) {
+    //     SysUser sysUser = UserThreadLocal.get();
+    //     // 插入文章
+    //     Article article = new Article();
+    //     article.setCommentCounts(0);
+    //     article.setCreateDate(System.currentTimeMillis());
+    //     article.setSummary(articleParam.getSummary());
+    //     article.setTitle(articleParam.getTitle());
+    //     article.setViewCounts(0);
+    //     article.setWeight(Article.Article_Common);
+    //     article.setAuthorId(sysUser.getId());
+    //     article.setCategoryId(Long.parseLong(articleParam.getCategory().getId()));
+    //     articleMapper.insert(article);
+    //
+    //     // 还有 文章内容表 文章-标签表
+    //     ArticleBodyParam body = articleParam.getBody();
+    //     // 文章内容
+    //     ArticleBody articleBody = new ArticleBody();
+    //     articleBody.setContent(body.getContent());
+    //     articleBody.setContentHtml(body.getContentHtml());
+    //     articleBody.setArticleId(article.getId());
+    //     articleBodyMapper.insert(articleBody);
+    //
+    //     // 文章-标签表
+    //     List<TagVo> tags = articleParam.getTags();
+    //     if(tags != null) {
+    //         for (TagVo tagVo : tags) {
+    //             ArticleTag articleTag = new ArticleTag();
+    //             articleTag.setArticleId(article.getId());
+    //             articleTag.setTagId(Long.parseLong(tagVo.getId()));
+    //             articleTagMapper.insert(articleTag);
+    //         }
+    //     }
+    //
+    //     // 更新操作 设置文章内容id 分类id
+    //     article.setBodyId(articleBody.getId());
+    //     articleMapper.updateById(article);
+    //
+    //     Map<String,String> map = new HashMap<>();
+    //     map.put("id",article.getId().toString());
+    //     return Result.success(map);
+    // }
+
+
     @Transactional // 加上事务
     @Override
     public Result publishArticle(ArticleParam articleParam) {
+        //此接口 要加入到登录拦截当中
         SysUser sysUser = UserThreadLocal.get();
+        /**
+         * 1. 发布文章 目的 构建Article对象
+         * 2. 作者id  当前的登录用户
+         * 3. 标签  要将标签加入到 关联列表当中
+         * 4. body 内容存储 article bodyId
+         */
         // 插入文章
         Article article = new Article();
-        article.setCommentCounts(0);
-        article.setCreateDate(System.currentTimeMillis());
-        article.setSummary(articleParam.getSummary());
-        article.setTitle(articleParam.getTitle());
-        article.setViewCounts(0);
-        article.setWeight(Article.Article_Common);
-        article.setAuthorId(sysUser.getId());
-        article.setCategoryId(Long.parseLong(articleParam.getCategory().getId()));
-        articleMapper.insert(article);
+        boolean isEdit = false;
+        if(articleParam.getId() != null) {
+            // 是编辑 设置内容
+            isEdit = true;
+            article.setId(articleParam.getId());
+            article.setTitle(articleParam.getTitle());
+            article.setSummary(articleParam.getSummary());
+            article.setCategoryId(Long.parseLong(articleParam.getCategory().getId()));
+            articleMapper.updateById(article);
+        } else {
+            article.setAuthorId(sysUser.getId());
+            article.setTitle(articleParam.getTitle());
+            article.setSummary(articleParam.getSummary());
+            article.setCategoryId(Long.parseLong(articleParam.getCategory().getId()));
 
-        // 还有 文章内容表 文章-标签表
-        ArticleBodyParam body = articleParam.getBody();
+            article.setCreateDate(System.currentTimeMillis());
+            article.setCommentCounts(0);
+            article.setViewCounts(0);
+            article.setWeight(Article.Article_Common);
+            // 插入之后 会生成一个文章id
+            articleMapper.insert(article);
+        }
+
         // 文章内容
-        ArticleBody articleBody = new ArticleBody();
-        articleBody.setContent(body.getContent());
-        articleBody.setContentHtml(body.getContentHtml());
-        articleBody.setArticleId(article.getId());
-        articleBodyMapper.insert(articleBody);
+        if(isEdit) {
+            ArticleBodyParam body = articleParam.getBody();
+
+            ArticleBody articleBody = new ArticleBody();
+            articleBody.setArticleId(article.getId());
+            articleBody.setContent(body.getContent());
+            articleBody.setContentHtml(body.getContentHtml());
+            LambdaQueryWrapper<ArticleBody> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(ArticleBody::getArticleId,article.getId());
+            articleBodyMapper.update(articleBody, queryWrapper);
+        } else {
+            ArticleBodyParam body = articleParam.getBody();
+
+            ArticleBody articleBody = new ArticleBody();
+            articleBody.setArticleId(article.getId());
+            articleBody.setContent(body.getContent());
+            articleBody.setContentHtml(body.getContentHtml());
+            articleBodyMapper.insert(articleBody);
+
+            // 更新操作 设置文章内容id 分类id
+            article.setBodyId(articleBody.getId());
+            articleMapper.updateById(article);
+        }
+
 
         // 文章-标签表
         List<TagVo> tags = articleParam.getTags();
         if(tags != null) {
             for (TagVo tagVo : tags) {
+                Long articleId = article.getId();
+                if(isEdit) {
+                    // 先删除
+                    LambdaQueryWrapper<ArticleTag> queryWrapper = Wrappers.lambdaQuery();
+                    queryWrapper.eq(ArticleTag::getArticleId, articleId);
+                    articleTagMapper.delete(queryWrapper);
+                }
                 ArticleTag articleTag = new ArticleTag();
-                articleTag.setArticleId(article.getId());
+                articleTag.setArticleId(articleId);
                 articleTag.setTagId(Long.parseLong(tagVo.getId()));
                 articleTagMapper.insert(articleTag);
             }
         }
 
-        // 更新操作 设置文章内容id 分类id
-        article.setBodyId(articleBody.getId());
-        articleMapper.updateById(article);
+        // 发送消息到mq中
+        if(isEdit) {
+            // 发送一条消息到mq, 文章更新了，先更后删解决缓存不一致
+        }
 
+        // 返回结果
         Map<String,String> map = new HashMap<>();
         map.put("id",article.getId().toString());
         return Result.success(map);
     }
+
 
     private List<ArticleVo> copyList(List<Article> records, boolean isAuthor, boolean isTags) {
         List<ArticleVo> articleVoList =  new ArrayList<>();
