@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Set;
 
 @SpringBootTest
 class BlogBackendApplicationTests {
@@ -59,7 +60,8 @@ class BlogBackendApplicationTests {
 
     @Test
     void test() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-
+        Set<String> keys = stringRedisTemplate.keys("listArticle*");
+        System.out.println(keys);
     }
 
 

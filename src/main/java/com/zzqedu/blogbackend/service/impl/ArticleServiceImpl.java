@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zzqedu.blogbackend.config.RabbitConfig;
 import com.zzqedu.blogbackend.dao.dos.Archives;
 import com.zzqedu.blogbackend.dao.mapper.ArticleBodyMapper;
 import com.zzqedu.blogbackend.dao.mapper.ArticleTagMapper;
@@ -17,7 +18,9 @@ import com.zzqedu.blogbackend.vo.param.ArticleBodyParam;
 import com.zzqedu.blogbackend.vo.param.ArticleParam;
 import com.zzqedu.blogbackend.vo.param.PageParams;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ThreadUtils;
 import org.joda.time.DateTime;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +55,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Resource
     ArticleTagMapper articleTagMapper;
+
+    @Resource
+    RabbitTemplate rabbitTemplate;
 
     /**
      * 查询文章列表  查文章、作者信息、tags信息  因为Mybatis-plus 不支持from_unixtime 函数，所以重写这个sql
@@ -285,6 +291,8 @@ public class ArticleServiceImpl implements ArticleService {
         // 发送消息到mq中
         if(isEdit) {
             // 发送一条消息到mq, 文章更新了，先更后删解决缓存不一致
+            SysUser user = UserThreadLocal.get();
+            rabbitTemplate.convertAndSend(RabbitConfig.DIRECT_NAME, RabbitConfig.ROUNTING_KEY,user);
         }
 
         // 返回结果
